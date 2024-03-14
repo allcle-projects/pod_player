@@ -14,6 +14,7 @@ class PodPlayerController {
   late PodGetXVideoController _ctr;
   late String getTag;
   bool _isCtrInitialised = false;
+  bool _disposed = false;
 
   Object? _initializationError;
 
@@ -50,6 +51,10 @@ class PodPlayerController {
         if (!_isCtrInitialised) {
           await _ctr.videoInit();
           podLog('$getTag Pod player Initialized');
+          if (_disposed) {
+            podLog('$getTag Pod player Already disposed');
+            await dispose();
+          }
         } else {
           podLog('$getTag Pod Player Controller Already Initialized');
         }
@@ -62,6 +67,10 @@ class PodPlayerController {
   }
 
   Future<void> _checkAndWaitTillInitialized() async {
+    if (_disposed) {
+      return;
+    }
+
     if (_ctr.controllerInitialized) {
       _isCtrInitialised = true;
       return;
@@ -161,13 +170,14 @@ class PodPlayerController {
   }
 
   ///Dispose pod video player controller
-  void dispose() {
+  Future dispose() async {
+    _disposed = true;
     _isCtrInitialised = false;
     _ctr.videoCtr?.removeListener(_ctr.videoListner);
-    _ctr.videoCtr?.dispose();
+    await _ctr.videoCtr?.dispose();
     _ctr.removeListenerId('podVideoState', _ctr.podStateListner);
     if (podPlayerConfig.wakelockEnabled) WakelockPlus.disable();
-    Get.delete<PodGetXVideoController>(
+    await Get.delete<PodGetXVideoController>(
       force: true,
       tag: getTag,
     );
@@ -185,8 +195,7 @@ class PodPlayerController {
       );
 
   //Change double tap duration
-  void setDoubeTapForwarDuration(int seconds) =>
-      _ctr.doubleTapForwardSeconds = seconds;
+  void setDoubeTapForwarDuration(int seconds) => _ctr.doubleTapForwardSeconds = seconds;
 
   ///Jumps to specific position of the video
   Future<void> videoSeekTo(Duration moment) async {

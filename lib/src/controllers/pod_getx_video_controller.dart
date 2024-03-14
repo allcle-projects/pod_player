@@ -54,10 +54,10 @@ class PodGetXVideoController extends _PodGesturesController {
   Future<void> videoInit() async {
     ///
     // checkPlayerType();
-    podLog(_videoPlayerType.toString());
     try {
       await _initializePlayer();
       await _videoCtr?.initialize();
+      podLog('videoInit completed');
       _videoDuration = _videoCtr?.value.duration ?? Duration.zero;
       await setLooping(isLooping);
       _videoCtr?.addListener(videoListner);
@@ -223,8 +223,7 @@ class PodGetXVideoController extends _PodGesturesController {
         onRightDoubleTap();
         return;
       }
-      if (event.isKeyPressed(LogicalKeyboardKey.keyF) &&
-          event.logicalKey.keyLabel == 'F') {
+      if (event.isKeyPressed(LogicalKeyboardKey.keyF) && event.logicalKey.keyLabel == 'F') {
         toggleFullScreenOnWeb(appContext, tag);
       }
       if (event.isKeyPressed(LogicalKeyboardKey.escape)) {

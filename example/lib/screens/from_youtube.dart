@@ -13,14 +13,21 @@ class _PlayVideoFromVimeoIdState extends State<PlayVideoFromYoutube> {
   final videoTextFieldCtr = TextEditingController();
   @override
   void initState() {
+    init();
+    PodVideoPlayer.enableGetxLogs = true;
+    PodVideoPlayer.enableLogs = true;
+    super.initState();
+  }
+
+  Future init() async {
     controller = PodPlayerController(
       playVideoFrom: PlayVideoFrom.youtube('https://youtu.be/A3ltMaM6noM'),
       podPlayerConfig: const PodPlayerConfig(
         videoQualityPriority: [720, 360],
         autoPlay: false,
       ),
-    )..initialise();
-    super.initState();
+    );
+    await controller.initialise();
   }
 
   @override
